@@ -44,7 +44,7 @@ implements Callback<ActiveListings> {
         holder.priceView.setText(listing.price);
         holder.shopeNameView.setText(listing.Shop.shop_name);
 
-
+//
 //        Picasso.with(holder.imageView.getContext())
 //                .load(listing.Images[0].url_570xN)
 //                .into(holder.imageView);
