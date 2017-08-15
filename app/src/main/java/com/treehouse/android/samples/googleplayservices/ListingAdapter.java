@@ -23,11 +23,13 @@ import retrofit.client.Response;
 public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ListingHolder>
 implements Callback<ActiveListings> {
 
+    private MainActivity activity;
     private LayoutInflater inflater;
     private ActiveListings activeListings;
 
-    public ListingAdapter(Context context){
-        inflater = LayoutInflater.from(context);
+    public ListingAdapter(MainActivity activity){
+        this.activity = activity;
+        inflater = LayoutInflater.from(activity);
     }
 
     @Override
@@ -43,21 +45,21 @@ implements Callback<ActiveListings> {
         holder.shopeNameView.setText(listing.Shop.shop_name);
 
 
-        Picasso.with(holder.imageView.getContext())
-                .load(listing.Images[0].url_570xN)
-                .into(holder.imageView);
+//        Picasso.with(holder.imageView.getContext())
+//                .load(listing.Images[0].url_570xN)
+//                .into(holder.imageView);
 
 
     }
 
     @Override
     public int getItemCount() {
-        if (activeListings == null){
+        if (activeListings == null)
             return 0;
-        }
-        if (activeListings.results == null){
+
+        if (activeListings.results == null)
             return 0;
-        }
+
         return activeListings.results.length;
     }
 
@@ -65,11 +67,17 @@ implements Callback<ActiveListings> {
     public void success(ActiveListings activeListings, Response response) {
         this.activeListings = activeListings;
         notifyDataSetChanged();
+        this.activity.showList();
     }
 
     @Override
     public void failure(RetrofitError error) {
 
+        this.activity.showError();
+    }
+
+    public ActiveListings getActiveListings(){
+        return  activeListings;
     }
 
     public class ListingHolder extends RecyclerView.ViewHolder{
