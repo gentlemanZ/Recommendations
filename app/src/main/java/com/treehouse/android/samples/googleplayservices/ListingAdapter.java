@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.treehouse.android.samples.googleplayservices.api.Etsy;
+import com.treehouse.android.samples.googleplayservices.google.GoogleServicesHelper;
 import com.treehouse.android.samples.googleplayservices.model.ActiveListings;
 import com.treehouse.android.samples.googleplayservices.model.Listing;
 
@@ -21,15 +23,18 @@ import retrofit.client.Response;
  */
 
 public class ListingAdapter extends RecyclerView.Adapter<ListingAdapter.ListingHolder>
-implements Callback<ActiveListings> {
+implements Callback<ActiveListings>, GoogleServicesHelper.GoogleServicesListener{
 
     private MainActivity activity;
     private LayoutInflater inflater;
     private ActiveListings activeListings;
 
+    private boolean isGooglePlayServicesAvailable;
+
     public ListingAdapter(MainActivity activity){
         this.activity = activity;
         inflater = LayoutInflater.from(activity);
+        this.isGooglePlayServicesAvailable = false;
     }
 
     @Override
@@ -44,6 +49,11 @@ implements Callback<ActiveListings> {
         holder.priceView.setText(listing.price);
         holder.shopeNameView.setText(listing.Shop.shop_name);
 
+        if (isGooglePlayServicesAvailable){
+
+        }else{
+
+        }
 
         Picasso.with(holder.imageView.getContext())
                 .load(listing.Images[0].url_570xN)
@@ -72,12 +82,32 @@ implements Callback<ActiveListings> {
 
     @Override
     public void failure(RetrofitError error) {
-
         this.activity.showError();
     }
 
     public ActiveListings getActiveListings(){
         return  activeListings;
+    }
+
+    @Override
+    public void onConnected() {
+
+        if (getItemCount() ==0){
+            Etsy.getAcitiveListings(this);
+        }
+        isGooglePlayServicesAvailable = true;
+        notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void onDisconnected() {
+        if (getItemCount() ==0){
+            Etsy.getAcitiveListings(this);
+        }
+        isGooglePlayServicesAvailable = false;
+        notifyDataSetChanged();
+
     }
 
     public class ListingHolder extends RecyclerView.ViewHolder{

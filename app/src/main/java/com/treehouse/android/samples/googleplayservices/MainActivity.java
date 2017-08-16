@@ -1,5 +1,6 @@
 package com.treehouse.android.samples.googleplayservices;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.treehouse.android.samples.googleplayservices.api.Etsy;
+import com.treehouse.android.samples.googleplayservices.google.GoogleServicesHelper;
 import com.treehouse.android.samples.googleplayservices.model.ActiveListings;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private View progressBar;
     private TextView errorView;
 
+    private GoogleServicesHelper googleServicesHelper;
     private ListingAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,21 +40,35 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new ListingAdapter(this);
         recyclerView.setAdapter(adapter);
-        if (savedInstanceState == null){
-            showLoading();
-            Etsy.getAcitiveListings(adapter);
-        }else{
+        googleServicesHelper = new GoogleServicesHelper(this,adapter);
+
+        showLoading();
+
+        if (savedInstanceState != null){
             if (savedInstanceState.containsKey(STATE_ACTIVE_LISTINGS)) {
                 adapter.success((ActiveListings) savedInstanceState.getParcelable(STATE_ACTIVE_LISTINGS), null);
-                showList();
-            }else {
-                showLoading();
-                Etsy.getAcitiveListings(adapter);
             }
         }
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        googleServicesHelper.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        googleServicesHelper.disConnect();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        googleServicesHelper.handleActivityResult(requestCode,resultCode,data);
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
